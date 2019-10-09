@@ -1,0 +1,24 @@
+﻿@using CodeBuilder.Models.TemplateModels
+@inherits RazorEngine.Templating.TemplateBase<CodeBuilder.Models.TemplateModels.DtoFileModel>
+using Abp.Extensions;
+using Abp.Runtime.Validation;
+using abpAngular.Dto;
+
+namespace @(Model.Namespace).@(Model.DirName).Dto
+{
+    public class Get@(Model.Name)sInput: PagedAndSortedInputDto, IShouldNormalize
+    {
+        /// <summary>
+        /// 关键字
+        /// </summary>
+        public string Filter { get; set; }
+
+        public void Normalize()
+        {
+            if (Sorting.IsNullOrWhiteSpace())
+            {
+				Sorting = "CreationTime DESC";
+            }
+        }
+    }
+}

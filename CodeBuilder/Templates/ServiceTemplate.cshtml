@@ -1,0 +1,157 @@
+﻿@using CodeBuilder.Models.TemplateModels
+@inherits RazorEngine.Templating.TemplateBase<CodeBuilder.Models.TemplateModels.ServiceFileModel>
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Linq.Dynamic.Core;
+using System.Text;
+using System.Threading.Tasks;
+using Abp.Application.Services.Dto;
+using @Model.Namespace.@(Model.DirName).Dto;
+using Abp.Domain.Repositories;
+using Abp.AutoMapper;
+using Microsoft.EntityFrameworkCore;
+using Abp.Authorization;
+using Abp.Linq.Extensions;
+using abpAngular.Authorization;
+using Abp.Collections.Extensions;
+using Abp.Extensions;
+
+namespace @Model.Namespace.@Model.DirName
+{
+    /// <summary>
+    /// @(Model.CnName)服务
+    /// </summary>
+    [AbpAuthorize(@(Model.Name)Permissions.Node)]
+    public class @(Model.Name)AppService : AbpFrameAppServiceBase, I@(Model.Name)AppService
+    {
+        private readonly IRepository<@(Model.Name), long> _repository;
+        /// <summary>
+        /// 构造函数
+        /// </summary>
+        /// <param name="repository"></param>
+        public @(Model.Name)AppService(IRepository<@(Model.Name), long> repository)
+        {
+            _repository = repository;
+        }
+    
+        /// <summary>
+        /// 拼接查询条件
+        /// </summary>
+        /// <param name="input"></param>
+        /// <returns></returns>
+        private IQueryable<@(Model.Name)> Create@(Model.Name)Query(Get@(Model.Name)sInput input)
+        {
+            var query = _repository.GetAll();
+    
+            //此处写自己的查询条件
+            //query = query.WhereIf(!input.Filter.IsNullOrEmpty(),
+            //p => p.Name.Contains(input.Filter) || p.DValue.Contains(input.Filter));
+
+            //query = query.WhereIf(input.DictionaryItemId.HasValue, p => p.DictionaryItemId == input.DictionaryItemId);
+
+            return query;
+        }
+
+        /// <summary>
+        /// 获取更新@(Model.CnName)的数据
+        /// </summary>
+        [AbpAuthorize(@(Model.Name)Permissions.Node)]
+        public async Task<PagedResultDto<@(Model.Name)ListDto>> Get@(Model.Name)s(Get@(Model.Name)sInput input)
+        {
+            var query = Create@(Model.Name)Query(input);
+
+            var count = await query.CountAsync();
+
+            var entityList = await query
+                .OrderBy(input.Sorting).AsNoTracking()
+                .PageBy(input)
+                .ToListAsync();
+
+            var entityListDtos = entityList.MapTo<List<@(Model.Name)ListDto>>();
+
+            return new PagedResultDto<@(Model.Name)ListDto>(count, entityListDtos);
+        }
+
+        /// <summary>
+        /// 获取更新@(Model.CnName)的数据
+        /// </summary>
+        [AbpAuthorize(@(Model.Name)Permissions.Create, @(Model.Name)Permissions.Edit)]
+        public async Task<Get@(Model.Name)ForEditOutput> Get@(Model.Name)ForEdit(NullableIdDto<long> input)
+        {
+            var output = new Get@(Model.Name)ForEditOutput();
+            @(Model.Name)EditDto editDto;
+            if (input.Id.HasValue)
+            {
+                var entity = await _repository.GetAsync(input.Id.Value);
+                editDto = entity.MapTo<@(Model.Name)EditDto>();
+            }
+            else
+            {
+                editDto = new @(Model.Name)EditDto();
+            }
+
+            output.@(Model.Name) = editDto;
+
+            return output;
+        }
+
+        /// <summary>
+        /// 创建或编辑@(Model.CnName)
+        /// </summary>
+        [AbpAuthorize(@(Model.Name)Permissions.Create, @(Model.Name)Permissions.Edit)]
+        public async Task CreateOrUpdate@(Model.Name)(CreateOrUpdate@(Model.Name)Input input)
+        {
+            if (!input.@(Model.Name).Id.HasValue)
+            {
+                await Create@(Model.Name)Async(input);
+            }
+            else
+            {
+                await Update@(Model.Name)Async(input);
+            }
+        }
+
+        /// <summary>
+        /// 新建
+        /// </summary>
+        /// <param name="input"></param>
+        /// <returns></returns>
+        [AbpAuthorize(@(Model.Name)Permissions.Create)]
+        public async Task<@(Model.Name)ListDto> Create@(Model.Name)Async(CreateOrUpdate@(Model.Name)Input input)
+        {
+            var entity = input.@(Model.Name).MapTo<@(Model.Name)>();
+            return (await _repository.InsertAsync(entity)).MapTo<@(Model.Name)ListDto>();
+        }
+
+        /// <summary>
+        /// 编辑
+        /// </summary>
+        /// <param name="input"></param>
+        /// <returns></returns>
+        [AbpAuthorize(@(Model.Name)Permissions.Edit)]
+        public async Task<@(Model.Name)ListDto> Update@(Model.Name)Async(CreateOrUpdate@(Model.Name)Input input)
+        {
+            var entity = input.@(Model.Name).MapTo<@(Model.Name)>();
+            return (await _repository.UpdateAsync(entity)).MapTo<@(Model.Name)ListDto>();
+        }
+
+        /// <summary>
+        /// 删除@(Model.CnName)
+        /// </summary>
+        [AbpAuthorize(@(Model.Name)Permissions.Delete)]
+        public async Task Delete(EntityDto<long> input)
+        {
+            await _repository.DeleteAsync(input.Id);
+        }
+
+        /// <summary>
+        /// 批量删除@(Model.CnName)
+        /// </summary>
+        [AbpAuthorize(@(Model.Name)Permissions.BatchDelete)]
+        public async Task BatchDelete(List<long> input)
+        {
+            await _repository.DeleteAsync(a => input.Contains(a.Id));
+        }
+    }
+}

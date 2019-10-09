@@ -1,0 +1,41 @@
+﻿@using CodeBuilder.Models.TemplateModels
+@inherits RazorEngine.Templating.TemplateBase<CodeBuilder.Models.TemplateModels.ServiceFileModel>
+using Abp.Application.Services;
+using Abp.Application.Services.Dto;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using @Model.Namespace.@(Model.DirName).Dto;
+
+namespace @Model.Namespace.@Model.DirName
+{
+    /// <summary>
+    /// @(Model.CnName)服务接口
+    /// </summary>
+    public interface I@(Model.Name)AppService: IApplicationService
+    {
+        /// <summary>
+        /// 获取@(Model.CnName)列表
+        /// </summary>
+        Task<PagedResultDto<@(Model.Name)ListDto>> Get@(Model.Name)s(Get@(Model.Name)sInput input);
+
+        /// <summary>
+        /// 获取@(Model.CnName)
+        /// </summary>
+        Task<Get@(Model.Name)ForEditOutput> Get@(Model.Name)ForEdit(NullableIdDto<long> input);
+
+        /// <summary>
+        /// 创建或编辑@(Model.CnName)
+        /// </summary>
+        Task CreateOrUpdate@(Model.Name)(CreateOrUpdate@(Model.Name)Input input);
+
+        /// <summary>
+        /// 删除@(Model.CnName)
+        /// </summary>
+        Task Delete(EntityDto<long> input);
+
+        /// <summary>
+        /// 删除@(Model.CnName)
+        /// </summary>
+        Task BatchDelete(List<long> input);
+    }
+}

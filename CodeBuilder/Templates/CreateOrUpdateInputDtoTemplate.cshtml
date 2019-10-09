@@ -1,0 +1,11 @@
+﻿@using CodeBuilder.Models.TemplateModels
+@inherits RazorEngine.Templating.TemplateBase<CodeBuilder.Models.TemplateModels.DtoFileModel>
+using System.ComponentModel.DataAnnotations;
+
+namespace @(Model.Namespace).@(Model.DirName).Dto
+{
+    public class CreateOrUpdate@(Model.Name)Input
+    {
+        public @(Model.Name)EditDto @(Model.Name) { get; set; }
+    }
+}
